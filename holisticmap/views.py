@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill
 # Create your views here.
 
 # dummy for testing
-CURRENT_ROLE = 'executive'
+CURRENT_ROLE = 'employee'
+# pick first employee as sample view
+EMPLOYEE_ID = 1 
 
 def index(request):
     # default empty lists
@@ -20,9 +22,30 @@ def index(request):
 
     elif CURRENT_ROLE == 'employee':
     # Employees see only their own record
-        employees = Employee.objects.filter(id=1)  # placeholder
-        companies = Company.objects.filter(id=employees.first().company.id) if employees.exists() else []
-        roles = Role.objects.filter(company__id=employees.first().company.id) if employees.exists() else []
+        employee = Employee.objects.get(id=EMPLOYEE_ID)
+        companies = [employee.company]
+        roles = Role.objects.filter(company=employee.company)
+        
+        # Employee skills
+        employee_skills = employee.skills.all()
+
+        # Handle adding a new skill
+        if request.method == 'POST':
+            skill_name = request.POST.get('skill_name')
+            if skill_name:
+                skill, created = Skill.objects.get_or_create(name=skill_name)
+                employee.skills.add(skill)  # ManyToMany prevents duplicates automatically
+                return redirect('index')
+        
+        # Pass to template
+        context = {
+            'current_role': CURRENT_ROLE,
+            'employee': employee,
+            'companies': companies,
+            'roles': roles,
+            'employee_skills': employee_skills,
+        }
+        return render(request, 'index.html', context)
 
     return render(request, 'index.html', {
         'executives': executives,

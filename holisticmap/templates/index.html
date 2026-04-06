@@ -8,7 +8,7 @@
 <body>
     <h1>Welcome to Holistic Map</h1>
     <h2>Current Role: {{ current_role }}</h2>
-    
+
     {% if current_role == 'executive' or current_role == 'employer' %}
         <h2>Companies</h2>
         <ul>
@@ -32,11 +32,27 @@
         </ul>
     {% elif current_role == 'employee' %}
         <h2>Your Info</h2>
-        <ul>
-        {% for employee in employees %}
-            <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
-        {% endfor %}
+        <p>{{ employee.name }} - Company: {{ employee.company.name }}</p>
+
         </ul>
+        <h2>Your Skills</h2>
+        {% if employee_skills %}
+            <ul>
+                {% for skill in employee_skills %}
+                    <li>{{skill.name}}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not added any skills yet.</p>
+        {% endif %}
+
+          <!-- Add a new skill -->
+        <h3>Add a Skill</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="skill_name" placeholder="Skill name" required>
+            <button type="submit">Add Skill</button>
+        </form>
     {% endif %}
 </body>
 </html>
