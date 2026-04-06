@@ -13,3 +13,7 @@
 *.bmp
 *.tiff
 *.svg
+
+# Ignore node_modules and environment variables
+node_modules/
+.env
