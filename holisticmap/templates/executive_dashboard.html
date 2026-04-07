@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Executive Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <h1>Welcome, {{ executive.name }}</h1>
+    <h2>Executive Dashboard</h2>
+
+    <h2>Companies</h2>
+    {% if companies %}
+        <ul>
+        {% for company in companies %}
+            <li>{{ company.name }} - Size: {{ company.company_size }} - Address: {{ company.address }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no companies yet.</p>
+    {% endif %}
+
+    <!-- Form to add a new company -->
+    <h3>Add a New Company</h3>
+    <form method="post" action="{% url 'create_company' %}">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Company Name" required>
+        <input type="text" name="address" placeholder="Address" required>
+        <input type="number" name="company_size" placeholder="Company Size" required>
+        <input type="text" name="join_secret" placeholder="Join Secret" required>
+        <button type="submit">Create Company</button>
+    </form>
+
+    <h2>Employees</h2>
+    {% if employees %}
+        <ul>
+        {% for employee in employees %}
+            <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No employees yet.</p>
+    {% endif %}
+
+    <h2>Roles</h2>
+    {% if roles %}
+        <ul>
+        {% for role in roles %}
+            <li>{{ role.title }} - Company: {{ role.company.name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No open roles yet.</p>
+    {% endif %}
+</body>
+</html>
