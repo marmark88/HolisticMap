@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Employer Dashboard - Holistic Map</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <h1>Welcome, {{ employer.name }}</h1>
+    <h2>Employer Dashboard</h2>
+
+    <h2>Your Company</h2>
+    <p>{{ company.name }} - Address: {{ company.address }}</p>
+
+    <h2>Your Employees</h2>
+    {% if employees %}
+        <ul>
+        {% for employee in employees %}
+            <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No employees yet.</p>
+    {% endif %}
+
+    <h2>Your Roles</h2>
+    {% if roles %}
+        <ul>
+        {% for role in roles %}
+            <li>{{ role.title }} - Company: {{ role.company.name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No open roles yet.</p>
+    {% endif %}
+
+    <h2>Best Employee Matches for Your Roles</h2>
+    {% if matches %}
+        {% for role in roles %}
+            <h3>{{ role.title }}</h3>
+            <ul>
+                {% for match in matches %}
+                    {% if match.role.id == role.id %}
+                        <li>{{ match.employee.name }} - Match Score: {{ match.score }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% else %}
+        <p>No matches calculated yet.</p>
+    {% endif %}
+</body>
+</html>

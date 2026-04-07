@@ -9,4 +9,6 @@ urlpatterns = [
 
     path('create-company/', views.create_company, name='create_company'),
     path('add-skill/', views.add_skill, name='add_skill'),
+
+    path('employer/', views.employer_dashboard, name='employer_dashboard'),
 ]

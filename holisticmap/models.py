@@ -43,6 +43,15 @@ class EmployeeSkill (models.Model):
     class Meta:
         unique_together = ('employee', 'skill') # prevents duplicate skills assigned to one employee
 
+class Employer (models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE) # company employer works for
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True) # when employer account was created
+
+    def __str__(self):
+        return self.name
+
 class Role (models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE) # company name
     title = models.CharField(max_length=255) # title of open position

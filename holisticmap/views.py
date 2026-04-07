@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill
+from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill, Employer
+from .services import match_employee_to_role
 # Create your views here.
 
 # dummy for testing
@@ -8,12 +9,16 @@ CURRENT_ROLE = 'employee'
 EMPLOYEE_ID = 1 
 # placeholder for first executive
 EXECUTIVE_ID = 1
+# placeholder for first employer
+EMPLOYER_ID = 1
 
 def index(request):
     if CURRENT_ROLE == 'executive':
         return redirect('executive_dashboard')
     elif CURRENT_ROLE == 'employee':
         return redirect('employee_dashboard')
+    elif CURRENT_ROLE == 'employer':
+        return redirect('employer_dashboard')
     return redirect('index')  # default fallback
 
 def executive_dashboard(request):
@@ -79,3 +84,21 @@ def add_skill(request):
             skill, created = Skill.objects.get_or_create(name=skill_name)
             employee.skills.add(skill)  # ManyToMany prevents duplicates automatically
     return redirect('employee_dashboard')
+
+def employer_dashboard(request):
+    employer = get_object_or_404(Employer, id=EMPLOYER_ID)
+    company = employer.company
+
+    employees = Employee.objects.filter(company=company)
+    roles = Role.objects.filter(company=company)
+
+    matches = match_employee_to_role(company)
+
+    return render(request, 'employer_dashboard.html', {
+        'current_role': CURRENT_ROLE,
+        'employer': employer,
+        'company': company,
+        'employees': employees,
+        'roles': roles,
+        'matches': matches,
+    })
