@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ role.title }}</title>
+</head>
+<body>
+
+<h1>{{ role.title }}</h1>
+<p><strong>Company:</strong> {{ role.company.name }}</p>
+<p><strong>Description:</strong> {{ role.description }}</p>
+
+<h2>Matched Employees</h2>
+
+{% if matches %}
+    <ul>
+        {% for match in matches %}
+            <li>
+                {{ match.employee.name }} - Match Score: {{ match.score }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No matches found.</p>
+{% endif %}
+
+<!-- ✅ Role-based back button -->
+{% if CURRENT_ROLE == 'executive' %}
+    <a href="{% url 'executive_dashboard' %}">Back to Dashboard</a>
+{% elif CURRENT_ROLE == 'employer' %}
+    <a href="{% url 'employer_dashboard' %}">Back to Dashboard</a>
+{% endif %}
+
+</body>
+</html>

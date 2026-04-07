@@ -112,14 +112,22 @@ def employer_dashboard(request):
     employees = Employee.objects.filter(company=company)
     roles = Role.objects.filter(company=company)
 
-    matches = match_employee_to_role(company)
-
     return render(request, 'employer_dashboard.html', {
         'current_role': CURRENT_ROLE,
         'employer': employer,
         'company': company,
         'employees': employees,
         'roles': roles,
+    })
+
+def role_detail(request, role_id):
+    role = get_object_or_404(Role, id=role_id)
+
+    matches = match_employee_to_role(role.company, role=role)
+
+    return render(request, 'role_detail.html', {
+        'current_role': CURRENT_ROLE,
+        'role': role,
         'matches': matches,
     })
 

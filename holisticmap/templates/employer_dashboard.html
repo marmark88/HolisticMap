@@ -28,34 +28,28 @@
     {% if roles %}
         <ul>
         {% for role in roles %}
-            <li>{{ role.title }} - Company: {{ role.company.name }}
-            <!-- Delete Role button -->
-            <a href="{% url 'delete_role' role.id %}" onclick="return confirm('Are you sure you want to delete this role?');">
-            Delete </a>
+            <li>
+                <!--  Clickable role -->
+                <a href="{% url 'role_detail' role.id %}">
+                    {{ role.title }}
+                </a>
+                - Company: {{ role.company.name }}
+
+                <!-- Delete Role button -->
+                <a href="{% url 'delete_role' role.id %}"
+                   onclick="return confirm('Are you sure you want to delete this role?');">
+                   Delete
+                </a>
             </li>
         {% endfor %}
         </ul>
     {% else %}
         <p>No open roles yet.</p>
     {% endif %}
+
     <!-- Create role button -->
     <a href="{% url 'create_role' company.id %}">Create Role</a>
     <br>
 
-    <h2>Best Employee Matches for Your Roles</h2>
-    {% if matches %}
-        {% for role in roles %}
-            <h3>{{ role.title }}</h3>
-            <ul>
-                {% for match in matches %}
-                    {% if match.role.id == role.id %}
-                        <li>{{ match.employee.name }} - Match Score: {{ match.score }}</li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    {% else %}
-        <p>No matches calculated yet.</p>
-    {% endif %}
 </body>
 </html>

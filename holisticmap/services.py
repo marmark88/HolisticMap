@@ -1,14 +1,18 @@
 from .models import Role, Employee 
 
-def match_employee_to_role(company, employee=None):
+def match_employee_to_role(company, employee=None, role=None):
     """
-    Return a sorted list of matches between a specific employee and open roles (if employee is provided) 
-    or all employees and roles based on skill overlap score. Build on this later to have more effecient search.
-    Right now it is O(n^2) because it loops through all employees for each role.
-
+    Return matches between employees and roles based on skill overlap score.
+    
+    - If role is provided → match employees to that one role
+    - If employee is provided → match that employee to roles
+    - Otherwise → match all employees to all roles
     """
-
-    roles = Role.objects.filter(company=company).prefetch_related('skills')
+    # handle roles
+    if role:
+        roles = [role]
+    else:
+        roles = Role.objects.filter(company=company).prefetch_related('skills')
 
     # if employee is provided, only match that employee to roles, otherwise match all employees to roles
     if employee:
