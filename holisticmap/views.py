@@ -65,6 +65,9 @@ def employee_dashboard(request):
     # Employee skills
     employee_skills = employee.skills.all() 
 
+    # Match employee to roles
+    matches = match_employee_to_role(employee.company, employee)
+
     # Pass to template
     return render(request, 'employee_dashboard.html', {
         'current_role': CURRENT_ROLE,
@@ -72,6 +75,7 @@ def employee_dashboard(request):
         'companies': companies,
         'roles': roles,
         'employee_skills': employee_skills,
+        'matches': matches,
     })
 
 def add_skill(request):
