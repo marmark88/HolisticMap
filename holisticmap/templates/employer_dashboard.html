@@ -28,12 +28,19 @@
     {% if roles %}
         <ul>
         {% for role in roles %}
-            <li>{{ role.title }} - Company: {{ role.company.name }}</li>
+            <li>{{ role.title }} - Company: {{ role.company.name }}
+            <!-- Delete Role button -->
+            <a href="{% url 'delete_role' role.id %}" onclick="return confirm('Are you sure you want to delete this role?');">
+            Delete </a>
+            </li>
         {% endfor %}
         </ul>
     {% else %}
         <p>No open roles yet.</p>
     {% endif %}
+    <!-- Create role button -->
+    <a href="{% url 'create_role' company.id %}">Create Role</a>
+    <br>
 
     <h2>Best Employee Matches for Your Roles</h2>
     {% if matches %}

@@ -17,7 +17,11 @@
     {% if employee_skills %}
         <ul>
         {% for skill in employee_skills %}
-            <li>{{ skill.name }}</li>
+            <li>
+                <!-- Remove skill button -->
+                {{ skill.name }}
+                <a href="{% url 'remove_skill' skill.id %}">Remove</a>
+            </li>
         {% endfor %}
         </ul>
     {% else %}

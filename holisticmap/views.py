@@ -4,13 +4,13 @@ from .services import match_employee_to_role
 # Create your views here.
 
 # dummy for testing
-CURRENT_ROLE = 'employee'
+CURRENT_ROLE = 'executive'
 # pick first employee as sample view
 EMPLOYEE_ID = 1 
 # placeholder for first executive
 EXECUTIVE_ID = 1
 # placeholder for first employer
-EMPLOYER_ID = 1
+EMPLOYER_ID = 2
 
 def index(request):
     if CURRENT_ROLE == 'executive':
@@ -56,6 +56,11 @@ def create_company(request):
             )
     return redirect('executive_dashboard')
 
+def delete_company(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+    company.delete() # cascades to delete all employees, employers, and roles
+    return redirect('executive_dashboard')
+
 def employee_dashboard(request):
     # Employees see only their own record
     employee = get_object_or_404(Employee, id=EMPLOYEE_ID)
@@ -89,6 +94,17 @@ def add_skill(request):
             employee.skills.add(skill)  # ManyToMany prevents duplicates automatically
     return redirect('employee_dashboard')
 
+def remove_skill(request, skill_id):
+    employee = get_object_or_404(Employee, id=EMPLOYEE_ID)
+
+    # get the skill from the request URL
+    skill = get_object_or_404(Skill, id=skill_id)
+
+    # remove the skill
+    employee.skills.remove(skill)
+
+    return redirect('employee_dashboard')
+
 def employer_dashboard(request):
     employer = get_object_or_404(Employer, id=EMPLOYER_ID)
     company = employer.company
@@ -106,3 +122,42 @@ def employer_dashboard(request):
         'roles': roles,
         'matches': matches,
     })
+
+# create a new role for a company
+def create_role(request, company_id):
+    # Executives or employers can create a new role for a company.
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        skills = request.POST.get('skills')
+
+        if title and description:
+            # Save the new role and assign to a variable
+            role = Role.objects.create(company=company, title=title, description=description)
+            
+            # Add skills if provided
+            if skills:
+                skills_name = [s.strip() for s in skills.split(',') if s.strip()]
+                for name in skills_name:
+                    skill, created = Skill.objects.get_or_create(name=name)
+                    RoleSkill.objects.create(role=role, skill=skill)
+            
+            # Redirect based on role
+            if CURRENT_ROLE == 'executive':
+                return redirect('executive_dashboard')
+            else:
+                return redirect('employer_dashboard')
+
+    return render(request, 'create_role.html', {'company': company})
+
+def delete_role(request, role_id):
+    role = get_object_or_404(Role, id=role_id)
+    role.delete() # delete the role and all associated RoleSkills
+
+    if CURRENT_ROLE == 'executive':
+        return redirect('executive_dashboard')
+    else:
+        return redirect('employer_dashboard')
+        
