@@ -1,58 +1,63 @@
+<!-- CHANGE THIS HTML TO BE A LOGIN PAGE FOR USERS -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <title>Holistic Map</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 <body>
-    <h1>Welcome to Holistic Map</h1>
-    <h2>Current Role: {{ current_role }}</h2>
+    <main class="container">
+        <section class="card">
+            <h1>Welcome to Holistic Map</h1>
+            <p class="muted">Current Role: {{ current_role }}</p>
 
-    {% if current_role == 'executive' or current_role == 'employer' %}
-        <h2>Companies</h2>
-        <ul>
-        {% for company in companies %}
-            <li>{{ company.name }} - Executive: {{ company.executive.name }}</li>
-        {% endfor %}
-        </ul>
-
-        <h2>Employees</h2>
-        <ul>
-        {% for employee in employees %}
-            <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
-        {% endfor %}
-        </ul>
-
-        <h2>Roles</h2>
-        <ul>
-        {% for role in roles %}
-            <li>{{ role.title }} - Company: {{ role.company.name }}</li>
-        {% endfor %}
-        </ul>
-    {% elif current_role == 'employee' %}
-        <h2>Your Info</h2>
-        <p>{{ employee.name }} - Company: {{ employee.company.name }}</p>
-
-        </ul>
-        <h2>Your Skills</h2>
-        {% if employee_skills %}
-            <ul>
-                {% for skill in employee_skills %}
-                    <li>{{skill.name}}</li>
+            {% if current_role == 'executive' or current_role == 'employer' %}
+                <h2>Companies</h2>
+                <ul>
+                {% for company in companies %}
+                    <li>{{ company.name }} - Executive: {{ company.executive.name }}</li>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have not added any skills yet.</p>
-        {% endif %}
+                </ul>
 
-          <!-- Add a new skill -->
-        <h3>Add a Skill</h3>
-        <form method="post">
-            {% csrf_token %}
-            <input type="text" name="skill_name" placeholder="Skill name" required>
-            <button type="submit">Add Skill</button>
-        </form>
-    {% endif %}
+                <h2>Employees</h2>
+                <ul>
+                {% for employee in employees %}
+                    <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
+                {% endfor %}
+                </ul>
+
+                <h2>Roles</h2>
+                <ul>
+                {% for role in roles %}
+                    <li>{{ role.title }} - Company: {{ role.company.name }}</li>
+                {% endfor %}
+                </ul>
+            {% elif current_role == 'employee' %}
+                <h2>Your Info</h2>
+                <p>{{ employee.name }} - Company: {{ employee.company.name }}</p>
+
+                <h2>Your Skills</h2>
+                {% if employee_skills %}
+                    <ul>
+                        {% for skill in employee_skills %}
+                            <li>{{ skill.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted">You have not added any skills yet.</p>
+                {% endif %}
+
+                <h3>Add a Skill</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="text" name="skill_name" placeholder="Skill name" required>
+                    <button type="submit">Add Skill</button>
+                </form>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>

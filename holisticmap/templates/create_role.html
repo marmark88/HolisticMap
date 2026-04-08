@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Employee Dashboard - Holistic Map</title>
+    {% load static %}
+    <title>Create Role - Holistic Map</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 
 <body>
-    <h1>Create a New Role for {{ company.name }}</h1>
-    <form method="post">
-        {% csrf_token %}
+    <main class="container">
+        <section class="card">
+            <h1>Create a New Role for {{ company.name }}</h1>
+            <form method="post">
+                {% csrf_token %}
 
-        <label for="title">Role Title:</label><br>
-        <input type="text" id="title" name="title" placeholder="Role title" required><br><br>
+                <label for="title">Role Title:</label>
+                <input type="text" id="title" name="title" placeholder="Role title" required>
 
-        <label for="description">Role Description:</label><br>
-        <textarea id="description" name="description" placeholder="Describe the role..." rows="4" required></textarea><br><br>
+                <label for="description">Role Description:</label>
+                <textarea id="description" name="description" placeholder="Describe the role..." rows="4" required></textarea>
 
-        <label for="skills">Required Skills (comma separated):</label><br>
-        <input type="text" id="skills" name="skills" placeholder="Python, Django, SQL"><br><br>
+                <label for="skills">Required Skills (comma separated):</label>
+                <input type="text" id="skills" name="skills" placeholder="Python, Django, SQL">
 
-        <button type="submit">Create Role</button>
-    </form>
+                <button type="submit">Create Role</button>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
-</body>

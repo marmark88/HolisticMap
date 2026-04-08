@@ -1,54 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <title>Employer Dashboard - Holistic Map</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 
 <body>
-    <h1>Welcome, {{ employer.name }}</h1>
-    <h2>Employer Dashboard</h2>
+    <main class="container">
+        <h1>Welcome, {{ employer.name }}</h1>
+        <p class="muted">Employer Dashboard</p>
 
-    <h2>Your Company</h2>
-    <p>{{ company.name }} - Address: {{ company.address }}</p>
+        <section class="card">
+            <h2>Your Company</h2>
+            <p>{{ company.name }} - Address: {{ company.address }}</p>
+        </section>
 
-    <h2>Your Employees</h2>
-    {% if employees %}
-        <ul>
-        {% for employee in employees %}
-            <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No employees yet.</p>
-    {% endif %}
+        <section class="card">
+            <h2>Your Employees</h2>
+            {% if employees %}
+                <ul>
+                {% for employee in employees %}
+                    <li>{{ employee.name }} - Company: {{ employee.company.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No employees yet.</p>
+            {% endif %}
+        </section>
 
-    <h2>Your Roles</h2>
-    {% if roles %}
-        <ul>
-        {% for role in roles %}
-            <li>
-                <!--  Clickable role -->
-                <a href="{% url 'role_detail' role.id %}">
-                    {{ role.title }}
-                </a>
+        <section class="card">
+            <h2>Your Roles</h2>
+            {% if roles %}
+                <ul>
+                {% for role in roles %}
+                    <li>
+                        <a href="{% url 'role_detail' role.id %}">
+                            {{ role.title }}
+                        </a>
+                        <span class="inline-actions">
+                            <a class="btn-danger" href="{% url 'delete_role' role.id %}"
+                               onclick="return confirm('Are you sure you want to delete this role?');">
+                               Delete
+                            </a>
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No open roles yet.</p>
+            {% endif %}
 
-                <!-- Delete Role button -->
-                <a href="{% url 'delete_role' role.id %}"
-                   onclick="return confirm('Are you sure you want to delete this role?');">
-                   Delete
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No open roles yet.</p>
-    {% endif %}
-
-    <!-- Create role button -->
-    <a href="{% url 'create_role' company.id %}">Create Role</a>
-    <br>
+            <a class="btn" href="{% url 'create_role' company.id %}">Create Role</a>
+        </section>
+    </main>
 
 </body>
 </html>

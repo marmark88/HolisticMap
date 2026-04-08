@@ -1,94 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <title>{{ role.title }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 <body>
+<main class="container">
+    <section class="card">
+        <h1>{{ role.title }}</h1>
+        <p><strong>Company:</strong> {{ role.company.name }}</p>
+        <p><strong>Description:</strong> {{ role.description }}</p>
+    </section>
 
-<h1>{{ role.title }}</h1>
-<p><strong>Company:</strong> {{ role.company.name }}</p>
-<p><strong>Description:</strong> {{ role.description }}</p>
-
-<h2>Skills Required</h2>
-{% if role.skills.exists %}
-    <ul>
-        {% for skill in role.skills.all %}
-            <li>{{ skill.name }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No skills listed for this role.</p>
-{% endif %}
-
-<!-- ROLE-BASED MATCH DISPLAY -->
-
-{% if CURRENT_ROLE == 'employee' %}
-    <h2>Your Match</h2>
-
-    {% if matches %}
-        {% for match in matches %}
-            <p>
-                Match Score: {{ match.score }}
-            </p>
-
-            <small>
-                Matching Skills:
-                {% for skill in match.matching_skills %}
-                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    <em>No matching skills</em>
+    <section class="card">
+        <h2>Skills Required</h2>
+        {% if role.skills.exists %}
+            <ul>
+                {% for skill in role.skills.all %}
+                    <li>{{ skill.name }}</li>
                 {% endfor %}
-            </small>
+            </ul>
+        {% else %}
+            <p class="muted">No skills listed for this role.</p>
+        {% endif %}
+    </section>
 
-            <br>
-
-            <small>
-                Missing Skills:
-                {% for skill in match.missing_skills %}
-                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    <em>No missing skills</em>
-                {% endfor %}
-            </small>
-        {% endfor %}
-    {% else %}
-        <p>No match found.</p>
-    {% endif %}
-
-{% else %}
-    <h2>Matched Employees</h2>
-
-    {% if matches %}
-        <ul>
-            {% for match in matches %}
-                <li>
-                    {{ match.employee.name }} - Match Score: {{ match.score }}
-                    <br>
-                    <small>
+    {% if CURRENT_ROLE == 'employee' %}
+        <section class="card">
+            <h2>Your Match</h2>
+            {% if matches %}
+                {% for match in matches %}
+                    <p><strong>Match Score:</strong> {{ match.score }}</p>
+                    <p class="muted">
                         Matching Skills:
                         {% for skill in match.matching_skills %}
                             {{ skill.name }}{% if not forloop.last %}, {% endif %}
                         {% empty %}
                             <em>No matching skills</em>
                         {% endfor %}
-                    </small>
-                </li>
-            {% endfor %}
-        </ul>
+                    </p>
+                    <p class="muted">
+                        Missing Skills:
+                        {% for skill in match.missing_skills %}
+                            {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No missing skills</em>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+            {% else %}
+                <p class="muted">No match found.</p>
+            {% endif %}
+        </section>
     {% else %}
-        <p>No matches found.</p>
+        <section class="card">
+            <h2>Matched Employees</h2>
+            {% if matches %}
+                <ul>
+                    {% for match in matches %}
+                        <li>
+                            {{ match.employee.name }} - Match Score: {{ match.score }}
+                            <p class="muted">
+                                Matching Skills:
+                                {% for skill in match.matching_skills %}
+                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    <em>No matching skills</em>
+                                {% endfor %}
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No matches found.</p>
+            {% endif %}
+        </section>
     {% endif %}
-{% endif %}
 
-<br>
-<!-- Role-based back button -->
-{% if CURRENT_ROLE == 'executive' %}
-    <a href="{% url 'executive_dashboard' %}">Back to Dashboard</a>
-{% elif CURRENT_ROLE == 'employer' %}
-    <a href="{% url 'employer_dashboard' %}">Back to Dashboard</a>
-{% elif CURRENT_ROLE == 'employee' %}
-    <a href="{% url 'employee_dashboard' %}">Back to Dashboard</a>
-{% endif %}
+    {% if CURRENT_ROLE == 'executive' %}
+        <a class="btn" href="{% url 'executive_dashboard' %}">Back to Dashboard</a>
+    {% elif CURRENT_ROLE == 'employer' %}
+        <a class="btn" href="{% url 'employer_dashboard' %}">Back to Dashboard</a>
+    {% elif CURRENT_ROLE == 'employee' %}
+        <a class="btn" href="{% url 'employee_dashboard' %}">Back to Dashboard</a>
+    {% endif %}
+</main>
 
 </body>
 </html>
