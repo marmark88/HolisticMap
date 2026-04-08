@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Holistic Map{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h1>Welcome to Holistic Map</h1>
+    <p>Please log in to continue.</p>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Not registered yet?</p>
+    <a href="{% url 'register_executive' %}">Register as Executive</a> |
+    <a href="{% url 'register_employer' %}">Register as Employer</a> |
+    <a href="{% url 'register_employee' %}">Register as Employee</a>
+</section>
+{% endblock %}

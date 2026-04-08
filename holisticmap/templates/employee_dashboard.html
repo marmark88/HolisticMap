@@ -1,64 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <title>Employee Dashboard - Holistic Map</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <main class="container">
-        <h1>Welcome, {{ employee.name }}</h1>
-        <p class="muted">Employee Dashboard</p>
+{% block title %}Employee Dashboard - Holistic Map{% endblock %}
 
-        <section class="card">
-            <h2>Your Company</h2>
-            <p>{{ employee.company.name }} - Address: {{ employee.company.address }}</p>
-        </section>
+{% block content %}
+    <h1>Welcome, {{ employee.name }}</h1>
+    <p class="muted">Employee Dashboard</p>
 
-        <section class="card">
-            <h2>Your Skills</h2>
-            {% if employee_skills %}
-                <ul>
-                {% for skill in employee_skills %}
-                    <li>
-                        {{ skill.name }}
-                        <span class="inline-actions">
-                            <a class="btn-danger" href="{% url 'remove_skill' skill.id %}">Remove</a>
-                        </span>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p class="muted">You have not added any skills yet.</p>
-            {% endif %}
+    <section class="card">
+        <h2>Your Company</h2>
+        <p>{{ employee.company.name }} - Address: {{ employee.company.address }}</p>
+    </section>
 
-            <h3>Add a Skill</h3>
-            <form method="post" action="{% url 'add_skill' %}">
-                {% csrf_token %}
-                <input type="text" name="skill_name" placeholder="Skill name" required>
-                <button type="submit">Add Skill</button>
-            </form>
-        </section>
+    <section class="card">
+        <h2>Your Skills</h2>
+        {% if employee_skills %}
+            <ul>
+            {% for skill in employee_skills %}
+                <li>
+                    {{ skill.name }}
+                    <span class="inline-actions">
+                        <a class="btn-danger" href="{% url 'remove_skill' skill.id %}">Remove</a>
+                    </span>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">You have not added any skills yet.</p>
+        {% endif %}
 
-        <section class="card">
-            <h2>Open Roles at Your Company</h2>
-            {% if roles %}
-                <ul>
-                {% for role in roles %}
-                    <li>
-                        <a href="{% url 'role_detail' role.id %}">
-                            {{ role.title }}
-                        </a>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p class="muted">No open roles yet.</p>
-            {% endif %}
-        </section>
-    </main>
-</body>
-</html>
+        <h3>Add a Skill</h3>
+        <form method="post" action="{% url 'add_skill' %}">
+            {% csrf_token %}
+            <input type="text" name="skill_name" placeholder="Skill name" required>
+            <button type="submit">Add Skill</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Open Roles at Your Company</h2>
+        {% if roles %}
+            <ul>
+            {% for role in roles %}
+                <li>
+                    <a href="{% url 'role_detail' role.id %}">
+                        {{ role.title }}
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No open roles yet.</p>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -15,14 +15,20 @@
             <form method="post">
                 {% csrf_token %}
 
-                <label for="title">Role Title:</label>
-                <input type="text" id="title" name="title" placeholder="Role title" required>
+                <div class="form-group">
+                    <label for="title">Role Title:</label>
+                    <input type="text" id="title" name="title" placeholder="Role title" required>
+                </div>
 
-                <label for="description">Role Description:</label>
-                <textarea id="description" name="description" placeholder="Describe the role..." rows="4" required></textarea>
+                <div class="form-group">
+                    <label for="description">Role Description:</label>
+                    <textarea id="description" name="description" placeholder="Describe the role..." rows="4" required></textarea>
+                </div>
 
-                <label for="skills">Required Skills (comma separated):</label>
-                <input type="text" id="skills" name="skills" placeholder="Python, Django, SQL">
+                <div class="form-group">
+                    <label for="skills">Required Skills (comma separated):</label>
+                    <input type="text" id="skills" name="skills" placeholder="Python, Django, SQL">
+                </div>
 
                 <button type="submit">Create Role</button>
             </form>

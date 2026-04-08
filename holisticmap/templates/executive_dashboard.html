@@ -1,93 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <title>Executive Dashboard - Holistic Map</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <main class="container">
-        <h1>Welcome, {{ executive.name }}</h1>
-        <p class="muted">Executive Dashboard</p>
+{% block title %}Executive Dashboard - Holistic Map{% endblock %}
 
-        <h2>Companies</h2>
-        {% if companies %}
-            {% for company in companies %}
-                <section class="card">
-                    <h3>{{ company.name }}</h3>
-                    <p class="muted">Size: {{ company.company_size }} - Address: {{ company.address }}</p>
-                    <span class="inline-actions">
-                        <a class="btn-danger" href="{% url 'delete_company' company.id %}"
-                           onclick="return confirm('Are you sure you want to delete this company? This will delete all employees, employers, and roles associated with it.');">
-                           Delete Company
-                        </a>
-                        <a class="btn" href="{% url 'create_role' company.id %}">Create Role</a>
-                    </span>
+{% block content %}
+    <h1>Welcome, {{ executive.name }}</h1>
+    <p class="muted">Executive Dashboard</p>
 
-                    <h3>Employees</h3>
-                    {% if company.employee_set.exists %}
-                        <ul>
-                        {% for employee in company.employee_set.all %}
-                            <li>{{ employee.name }} - Phone: {{ employee.phone }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="muted">No employees yet.</p>
-                    {% endif %}
-
-                    <h3>Employers</h3>
-                    {% if company.employer_set.exists %}
-                        <ul>
-                        {% for employer in company.employer_set.all %}
-                            <li>{{ employer.name }} - Phone: {{ employer.phone }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="muted">No employers yet.</p>
-                    {% endif %}
-
-                    <h3>Roles</h3>
-                    {% if company.role_set.exists %}
-                        <ul>
-                        {% for role in company.role_set.all %}
-                            <li>
-                                <a href="{% url 'role_detail' role.id %}">{{ role.title }}</a> - Company: {{ role.company.name }}
-                                <span class="inline-actions">
-                                    <a class="btn-danger" href="{% url 'delete_role' role.id %}"
-                                       onclick="return confirm('Are you sure you want to delete this role?');">
-                                        Delete
-                                    </a>
-                                </span>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="muted">No open roles yet.</p>
-                    {% endif %}
-                </section>
-            {% endfor %}
-        {% else %}
+    <h2>Companies</h2>
+    {% if companies %}
+        {% for company in companies %}
             <section class="card">
-                <p class="muted">You have no companies assigned yet.</p>
+                <h3>{{ company.name }}</h3>
+                <p class="muted">Size: {{ company.company_size }} - Address: {{ company.address }}</p>
+                <span class="inline-actions">
+                    <a class="btn-danger" href="{% url 'delete_company' company.id %}"
+                       onclick="return confirm('Are you sure you want to delete this company? This will delete all employees, employers, and roles associated with it.');">
+                       Delete Company
+                    </a>
+                    <a class="btn" href="{% url 'create_role' company.id %}">Create Role</a>
+                </span>
+
+                <h3>Employees</h3>
+                {% if company.employee_set.exists %}
+                    <ul>
+                    {% for employee in company.employee_set.all %}
+                        <li>{{ employee.name }} - Phone: {{ employee.phone }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted">No employees yet.</p>
+                {% endif %}
+
+                <h3>Employers</h3>
+                {% if company.employer_set.exists %}
+                    <ul>
+                    {% for employer in company.employer_set.all %}
+                        <li>{{ employer.name }} - Phone: {{ employer.phone }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted">No employers yet.</p>
+                {% endif %}
+
+                <h3>Roles</h3>
+                {% if company.role_set.exists %}
+                    <ul>
+                    {% for role in company.role_set.all %}
+                        <li>
+                            <a href="{% url 'role_detail' role.id %}">{{ role.title }}</a> - Company: {{ role.company.name }}
+                            <span class="inline-actions">
+                                <a class="btn-danger" href="{% url 'delete_role' role.id %}"
+                                   onclick="return confirm('Are you sure you want to delete this role?');">
+                                    Delete
+                                </a>
+                            </span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted">No open roles yet.</p>
+                {% endif %}
             </section>
-        {% endif %}
-
+        {% endfor %}
+    {% else %}
         <section class="card">
-            <h3>Add a New Company</h3>
-            <form method="post" action="{% url 'create_company' %}">
-                {% csrf_token %}
-                <input type="text" name="name" placeholder="Company Name" required>
-                <input type="text" name="address" placeholder="Address" required>
-                <input type="number" name="company_size" placeholder="Company Size" required>
-                <input type="text" name="employee_secret" placeholder="Employee Join Secret" required>
-                <input type="text" name="employer_secret" placeholder="Employer Join Secret" required>
-                <button type="submit">Create Company</button>
-            </form>
+            <p class="muted">You have no companies assigned yet.</p>
         </section>
-    </main>
+    {% endif %}
 
-</body>
-</html>
+    <section class="card">
+        <h3>Add a New Company</h3>
+        <form method="post" action="{% url 'create_company' %}">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Company Name" required>
+            <input type="text" name="address" placeholder="Address" required>
+            <input type="number" name="company_size" placeholder="Company Size" required>
+            <input type="text" name="employee_secret" placeholder="Employee Join Secret" required>
+            <input type="text" name="employer_secret" placeholder="Employer Join Secret" required>
+            <button type="submit">Create Company</button>
+        </form>
+    </section>
+{% endblock %}

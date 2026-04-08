@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register as Employer</title>
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
+</head>
+<body>
+    <main class="container">
+        <section class="card">
+            <h1>Employer Signup</h1>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="form-group">
+                    {{ form.username.label_tag }}<br>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password1.label_tag }}<br>
+                    {{ form.password1 }}
+                    {{ form.password1.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password2.label_tag }}<br>
+                    {{ form.password2 }}
+                    {{ form.password2.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.name.label_tag }}<br>
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.phone.label_tag }}<br>
+                    {{ form.phone }}
+                    {{ form.phone.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.company.label_tag }}<br>
+                    {{ form.company }}
+                    {{ form.company.errors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.company_secret.label_tag }}<br>
+                    {{ form.company_secret }}
+                    <div class="field-error">
+                        {{ form.company_secret.errors }}
+                    </div>
+                </div>
+
+                <button type="submit">Register</button>
+            </form>
+
+            <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+        </section>
+    </main>
+</body>
+</html>
