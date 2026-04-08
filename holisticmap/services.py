@@ -27,14 +27,19 @@ def match_employee_to_role(company, employee=None, role=None):
         for employee in employees:
             employee_skills = set(employee.skills.all())
 
+            matching_skills = role_skills & employee_skills
+            missing_skills = role_skills - employee_skills
+
             if not role_skills:
                 score = 0
             else:
-                score = len(role_skills & employee_skills) / len(role_skills)
+                score = len(matching_skills) / len(role_skills)
             
             matches.append({
                 'role': role,
                 'employee': employee,
+                'matching_skills': matching_skills,
+                'missing_skills': missing_skills,
                 'score': round(score, 2),
             })
     

@@ -69,10 +69,9 @@
                 {% else %}
                     <p>No open roles yet.</p>
                 {% endif %}
-
                 <!-- Create role button for this company -->
                 <a href="{% url 'create_role' company.id %}">Create Role</a>
-                <br><br>
+                <br>
             </li>
         {% endfor %}
         </ul>

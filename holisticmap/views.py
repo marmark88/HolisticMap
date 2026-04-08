@@ -4,7 +4,7 @@ from .services import match_employee_to_role
 # Create your views here.
 
 # dummy for testing
-CURRENT_ROLE = 'executive'
+CURRENT_ROLE = 'employee'
 # pick first employee as sample view
 EMPLOYEE_ID = 1 
 # placeholder for first executive
@@ -70,9 +70,6 @@ def employee_dashboard(request):
     # Employee skills
     employee_skills = employee.skills.all() 
 
-    # Match employee to roles
-    matches = match_employee_to_role(employee.company, employee)
-
     # Pass to template
     return render(request, 'employee_dashboard.html', {
         'current_role': CURRENT_ROLE,
@@ -80,7 +77,6 @@ def employee_dashboard(request):
         'companies': companies,
         'roles': roles,
         'employee_skills': employee_skills,
-        'matches': matches,
     })
 
 def add_skill(request):
@@ -123,10 +119,14 @@ def employer_dashboard(request):
 def role_detail(request, role_id):
     role = get_object_or_404(Role, id=role_id)
 
-    matches = match_employee_to_role(role.company, role=role)
+    if CURRENT_ROLE == 'employee':
+        employee = get_object_or_404(Employee, id=EMPLOYEE_ID)
+        matches = match_employee_to_role(role.company, employee, role=role)
+    else:
+        matches = match_employee_to_role(role.company, role=role)
 
     return render(request, 'role_detail.html', {
-        'current_role': CURRENT_ROLE,
+        'CURRENT_ROLE': CURRENT_ROLE,
         'role': role,
         'matches': matches,
     })

@@ -33,7 +33,6 @@
                 <a href="{% url 'role_detail' role.id %}">
                     {{ role.title }}
                 </a>
-                - Company: {{ role.company.name }}
 
                 <!-- Delete Role button -->
                 <a href="{% url 'delete_role' role.id %}"

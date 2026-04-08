@@ -36,22 +36,20 @@
         <button type="submit">Add Skill</button>
     </form>
 
-    <h2>Internal Role Matches</h2>
-    {% if matches %}
+    <h2>Open Roles at Your Company</h2>
+    {% if roles %}
+        <ul>
         {% for role in roles %}
-            <h3>{{ role.title }}</h3>
-            <ul>
-                {% for match in matches %}
-                    {% if match.role.id == role.id %}
-                        <li>Match Score: {{ match.score }}</li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+            <li>
+                <!--  Clickable role -->
+                <a href="{% url 'role_detail' role.id %}">
+                    {{ role.title }}
+                </a>
+            </li>
         {% endfor %}
+        </ul>
     {% else %}
-        <p>No matches yet.</p>
+        <p>No open roles yet.</p>
     {% endif %}
-
-    <p>Matches are calculated based on the skills you have and the skills required for the role. The higher the match score, the better the match.</p>
 </body>
 </html>
