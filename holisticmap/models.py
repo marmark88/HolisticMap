@@ -12,7 +12,8 @@ class Executive (models.Model):
 class Company (models.Model):
     executive = models.ForeignKey(Executive, on_delete=models.CASCADE) # executive's company
     name = models.CharField(max_length=255) # name of company
-    join_secret_hash = models.CharField(max_length=255) # company password for employees
+    employee_secret_hash = models.CharField(max_length=255) # company password for employees
+    employer_secret_hash = models.CharField(max_length=255) # company password for employers
     company_size = models.IntegerField() # how many employees company has
     address = models.CharField(max_length=255) # address
     created_at = models.DateTimeField(auto_now_add=True) # when company was created in system

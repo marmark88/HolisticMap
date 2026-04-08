@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.hashers import make_password
 from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill, Employer
 from .services import match_employee_to_role
 # Create your views here.
@@ -44,15 +45,21 @@ def create_company(request):
         name = request.POST.get('name')
         address = request.POST.get('address')
         size = request.POST.get('company_size')
-        secret = request.POST.get('join_secret')
+        employee_secret = request.POST.get('employee_secret')
+        employer_secret = request.POST.get('employer_secret')
 
-        if name and address and size and secret:
+        if name and address and size and employee_secret and employer_secret:
+            # hashes the shared password to make an account for employees and employers
+            employee_secret_hash = make_password(employee_secret)
+            employer_secret_hash = make_password(employer_secret)
+
             Company.objects.create(
                 executive=executive,
                 name=name,
                 address=address,
                 company_size=int(size),
-                join_secret_hash=secret  # hash it in later version
+                employee_secret_hash=employee_secret_hash,
+                employer_secret_hash=employer_secret_hash,
             )
     return redirect('executive_dashboard')
 
