@@ -253,6 +253,8 @@ def employer_dashboard(request):
 def role_detail(request, role_id):
     role = get_object_or_404(Role, id=role_id)
     current_role = _get_user_role(request.user)
+    required_skills = role.skills.filter(roleskill__is_required=True).distinct()
+    preferred_skills = role.skills.filter(roleskill__is_required=False).distinct()
 
     if current_role == 'employee':
         employee = request.user.employee
@@ -274,6 +276,8 @@ def role_detail(request, role_id):
         'CURRENT_ROLE': current_role,
         'role': role,
         'matches': matches,
+        'required_skills': required_skills,
+        'preferred_skills': preferred_skills,
     })
 
 # create a new role for a company
@@ -292,18 +296,29 @@ def create_role(request, company_id):
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
-        skills = request.POST.get('skills')
+        required_skills = request.POST.get('required_skills', '')
+        preferred_skills = request.POST.get('preferred_skills', '')
 
         if title and description:
             # Save the new role and assign to a variable
             role = Role.objects.create(company=company, title=title, description=description)
             
-            # Add skills if provided
-            if skills:
-                skills_name = [s.strip() for s in skills.split(',') if s.strip()]
-                for name in skills_name:
-                    skill, created = Skill.objects.get_or_create(name=name)
-                    RoleSkill.objects.create(role=role, skill=skill)
+            # Add required and preferred skills if provided.
+            # If a skill appears in both lists, required takes precedence.
+            required_skill_names = {
+                s.strip() for s in required_skills.split(',') if s.strip()
+            }
+            preferred_skill_names = {
+                s.strip() for s in preferred_skills.split(',') if s.strip()
+            } - required_skill_names
+
+            for name in required_skill_names:
+                skill, _ = Skill.objects.get_or_create(name=name)
+                RoleSkill.objects.create(role=role, skill=skill, is_required=True)
+
+            for name in preferred_skill_names:
+                skill, _ = Skill.objects.get_or_create(name=name)
+                RoleSkill.objects.create(role=role, skill=skill, is_required=False)
             
             if current_role == 'executive':
                 return redirect('executive_dashboard')

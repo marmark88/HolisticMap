@@ -16,15 +16,28 @@
     </section>
 
     <section class="card">
-        <h2>Skills Required</h2>
-        {% if role.skills.exists %}
+        <h2>Required Skills</h2>
+        {% if required_skills %}
             <ul>
-                {% for skill in role.skills.all %}
+                {% for skill in required_skills %}
                     <li>{{ skill.name }}</li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="muted">No skills listed for this role.</p>
+            <p class="muted">No required skills listed for this role.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Preferred Skills</h2>
+        {% if preferred_skills %}
+            <ul>
+                {% for skill in preferred_skills %}
+                    <li>{{ skill.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No preferred skills listed for this role.</p>
         {% endif %}
     </section>
 
@@ -43,11 +56,19 @@
                         {% endfor %}
                     </p>
                     <p class="muted">
-                        Missing Skills:
-                        {% for skill in match.missing_skills %}
+                        Missing Required Skills:
+                        {% for skill in match.missing_required_skills %}
                             {{ skill.name }}{% if not forloop.last %}, {% endif %}
                         {% empty %}
-                            <em>No missing skills</em>
+                            <em>No missing required skills</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
+                        Missing Preferred Skills:
+                        {% for skill in match.missing_preferred_skills %}
+                            {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No missing preferred skills</em>
                         {% endfor %}
                     </p>
                 {% endfor %}

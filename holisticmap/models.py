@@ -77,5 +77,7 @@ class RoleSkill(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
 
+    is_required = models.BooleanField(default=True)
+
     class Meta:
         unique_together = ("role", "skill")

@@ -1,4 +1,4 @@
-from .models import Role, Employee 
+from .models import Role, Employee
 
 def match_employee_to_role(company, employee=None, role=None):
     """
@@ -12,7 +12,7 @@ def match_employee_to_role(company, employee=None, role=None):
     if role:
         roles = [role]
     else:
-        roles = Role.objects.filter(company=company).prefetch_related('skills')
+        roles = Role.objects.filter(company=company).prefetch_related('roleskill_set__skill')
 
     # if employee is provided, only match that employee to roles, otherwise match all employees to roles
     if employee:
@@ -22,12 +22,21 @@ def match_employee_to_role(company, employee=None, role=None):
 
     matches = []
     for role in roles:
-        role_skill_map = {
-            skill.name.casefold(): skill
-            for skill in role.skills.all()
-            if skill.name
-        }
-        role_skill_keys = set(role_skill_map.keys())
+        role_skill_rows = role.roleskill_set.select_related('skill')
+        required_skill_map = {}
+        preferred_skill_map = {}
+        for role_skill in role_skill_rows:
+            skill = role_skill.skill
+            if not skill.name:
+                continue
+            key = skill.name.casefold()
+            if role_skill.is_required:
+                required_skill_map[key] = skill
+            else:
+                preferred_skill_map[key] = skill
+
+        required_skill_keys = set(required_skill_map.keys())
+        preferred_skill_keys = set(preferred_skill_map.keys())
 
         for employee in employees:
             employee_skill_keys = {
@@ -36,20 +45,39 @@ def match_employee_to_role(company, employee=None, role=None):
                 if skill.name
             }
 
-            matching_skills_keys = role_skill_keys & employee_skill_keys
-            matching_skills = {role_skill_map[key] for key in matching_skills_keys}
-            missing_skills = {role_skill_map[key] for key in (role_skill_keys - employee_skill_keys)}
+            matching_required_keys = required_skill_keys & employee_skill_keys
+            matching_preferred_keys = preferred_skill_keys & employee_skill_keys
 
-            if not role_skill_keys:
+            matching_skills = (
+                {required_skill_map[key] for key in matching_required_keys}
+                | {preferred_skill_map[key] for key in matching_preferred_keys}
+            )
+            missing_required_skills = {
+                required_skill_map[key]
+                for key in (required_skill_keys - employee_skill_keys)
+            }
+            missing_preferred_skills = {
+                preferred_skill_map[key]
+                for key in (preferred_skill_keys - employee_skill_keys)
+            }
+
+            # Required skills count more than preferred.
+            weighted_total = (len(required_skill_keys) * 1.0) + (len(preferred_skill_keys) * 0.5)
+            weighted_matches = (len(matching_required_keys) * 1.0) + (len(matching_preferred_keys) * 0.5)
+
+            if weighted_total == 0:
                 score = 0
             else:
-                score = (len(matching_skills_keys) / len(role_skill_keys)) * 100
+                score = (weighted_matches / weighted_total) * 100
             
             matches.append({
                 'role': role,
                 'employee': employee,
                 'matching_skills': matching_skills,
-                'missing_skills': missing_skills,
+                'matching_required_skills': {required_skill_map[key] for key in matching_required_keys},
+                'matching_preferred_skills': {preferred_skill_map[key] for key in matching_preferred_keys},
+                'missing_required_skills': missing_required_skills,
+                'missing_preferred_skills': missing_preferred_skills,
                 'score': round(score, 2),
             })
     
