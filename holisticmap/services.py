@@ -22,18 +22,28 @@ def match_employee_to_role(company, employee=None, role=None):
 
     matches = []
     for role in roles:
-        role_skills = set(role.skills.all())
+        role_skill_map = {
+            skill.name.casefold(): skill
+            for skill in role.skills.all()
+            if skill.name
+        }
+        role_skill_keys = set(role_skill_map.keys())
 
         for employee in employees:
-            employee_skills = set(employee.skills.all())
+            employee_skill_keys = {
+                skill.name.casefold()
+                for skill in employee.skills.all()
+                if skill.name
+            }
 
-            matching_skills = role_skills & employee_skills
-            missing_skills = role_skills - employee_skills
+            matching_skills_keys = role_skill_keys & employee_skill_keys
+            matching_skills = {role_skill_map[key] for key in matching_skills_keys}
+            missing_skills = {role_skill_map[key] for key in (role_skill_keys - employee_skill_keys)}
 
-            if not role_skills:
+            if not role_skill_keys:
                 score = 0
             else:
-                score = len(matching_skills) / len(role_skills)
+                score = (len(matching_skills_keys) / len(role_skill_keys)) * 100
             
             matches.append({
                 'role': role,

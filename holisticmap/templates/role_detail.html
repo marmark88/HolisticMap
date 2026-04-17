@@ -33,7 +33,7 @@
             <h2>Your Match</h2>
             {% if matches %}
                 {% for match in matches %}
-                    <p><strong>Match Score:</strong> {{ match.score }}</p>
+                    <p><strong>Match Score:</strong> {{ match.score }}%</p>
                     <p class="muted">
                         Matching Skills:
                         {% for skill in match.matching_skills %}

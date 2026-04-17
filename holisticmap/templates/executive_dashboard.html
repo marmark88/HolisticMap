@@ -47,7 +47,7 @@
                     <ul>
                     {% for role in company.role_set.all %}
                         <li>
-                            <a href="{% url 'role_detail' role.id %}">{{ role.title }}</a> - Company: {{ role.company.name }}
+                            <a href="{% url 'role_detail' role.id %}">{{ role.title }}</a>
                             <span class="inline-actions">
                                 <a class="btn-danger" href="{% url 'delete_role' role.id %}"
                                    onclick="return confirm('Are you sure you want to delete this role?');">
