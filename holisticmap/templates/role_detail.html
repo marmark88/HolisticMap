@@ -83,13 +83,29 @@
                 <ul>
                     {% for match in matches %}
                         <li>
-                            {{ match.employee.name }} - Match Score: {{ match.score }}
+                            {{ match.employee.name }} - Match Score: {{ match.score }}%
                             <p class="muted">
                                 Matching Skills:
                                 {% for skill in match.matching_skills %}
                                     {{ skill.name }}{% if not forloop.last %}, {% endif %}
                                 {% empty %}
                                     <em>No matching skills</em>
+                                {% endfor %}
+                            </p>
+                            <p class="muted">
+                                Missing Required Skills:
+                                {% for skill in match.missing_required_skills %}
+                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    <em>No missing required skills</em>
+                                {% endfor %}
+                            </p>
+                            <p class="muted">
+                                Missing Preferred Skills:
+                                {% for skill in match.missing_preferred_skills %}
+                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    <em>No missing preferred skills</em>
                                 {% endfor %}
                             </p>
                         </li>
