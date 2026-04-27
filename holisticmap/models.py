@@ -81,3 +81,25 @@ class RoleSkill(models.Model):
 
     class Meta:
         unique_together = ("role", "skill")
+
+class Education(models.Model):
+    school = models.CharField(max_length=255)
+    degree = models.CharField(max_length=255)
+    field_of_study = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.school} - {self.degree} - {self.field_of_study}"
+        
+class RoleEducation(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    education = models.ForeignKey(Education, on_delete=models.CASCADE)
+
+    is_required = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("role", "education")
+
+
+class EmployeeEducation(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    education = models.ForeignKey(Education, on_delete=models.CASCADE)

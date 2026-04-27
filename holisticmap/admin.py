@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill, Employer
+from .models import Executive, Company, Employee, Skill, EmployeeSkill, Role, RoleSkill, Employer, Education, RoleEducation, EmployeeEducation
 # Register your models here.
 
 admin.site.register(Executive)
@@ -10,3 +10,6 @@ admin.site.register(EmployeeSkill)
 admin.site.register(Role)
 admin.site.register(RoleSkill)
 admin.site.register(Employer)
+admin.site.register(Education)
+admin.site.register(RoleEducation)
+admin.site.register(EmployeeEducation)
