@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Holistic Map</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'holisticmap/favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 <body>
@@ -16,9 +17,9 @@
 
             <div class="action-buttons">
                 <a class="btn" href="{% url 'login' %}">Login</a>
-                <a class="btn-secondary" href="{% url 'register_executive' %}">Sign Up as Executive</a>
-                <a class="btn-secondary" href="{% url 'register_employer' %}">Sign Up as Employer</a>
-                <a class="btn-secondary" href="{% url 'register_employee' %}">Sign Up as Employee</a>
+                <a class="btn-secondary" href="{% url 'register_executive' %}">Register as Executive</a>
+                <a class="btn-secondary" href="{% url 'register_employer' %}">Register as Employer</a>
+                <a class="btn-secondary" href="{% url 'register_employee' %}">Register as Employee</a>
             </div>
         </section>
     </main>

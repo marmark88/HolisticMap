@@ -21,6 +21,37 @@ body {
   line-height: 1.45;
 }
 
+header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+}
+
+nav {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  background: #ffffff;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  background: #f3f4f6;
+  text-decoration: none;
+}
+
 .container {
   max-width: 960px;
   margin: 2rem auto;
@@ -169,6 +200,13 @@ form {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
+}
+
+.inline-link-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
 }
 
 .field-error {

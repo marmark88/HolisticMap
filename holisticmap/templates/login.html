@@ -19,8 +19,10 @@
     </form>
 
     <p>Not registered yet?</p>
-    <a href="{% url 'register_executive' %}">Register as Executive</a> |
-    <a href="{% url 'register_employer' %}">Register as Employer</a> |
-    <a href="{% url 'register_employee' %}">Register as Employee</a>
+    <div class="inline-link-actions">
+        <a class="btn-secondary" href="{% url 'register_executive' %}">Register as Executive</a>
+        <a class="btn-secondary" href="{% url 'register_employer' %}">Register as Employer</a>
+        <a class="btn-secondary" href="{% url 'register_employee' %}">Register as Employee</a>
+    </div>
 </section>
 {% endblock %}

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Holistic Map{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'holisticmap/favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 <body>
@@ -12,17 +13,17 @@
         <nav>
             {% if user.is_authenticated %}
                 {% if role == 'executive' %}
-                    <a href="{% url 'executive_dashboard' %}">Home</a>
+                    <a class="nav-link" href="{% url 'executive_dashboard' %}">Home</a>
                 {% elif role == 'employer' %}
-                    <a href="{% url 'employer_dashboard' %}">Home</a>
+                    <a class="nav-link" href="{% url 'employer_dashboard' %}">Home</a>
                 {% elif role == 'employee' %}
-                    <a href="{% url 'employee_dashboard' %}">Home</a>
+                    <a class="nav-link" href="{% url 'employee_dashboard' %}">Home</a>
                 {% else %}
-                    <a href="{% url 'index' %}">Home</a>
+                    <a class="nav-link" href="{% url 'index' %}">Home</a>
                 {% endif %}
-                <a href="{% url 'user_logout' %}">Logout</a>
+                <a class="nav-link" href="{% url 'user_logout' %}">Logout</a>
             {% else %}
-                <a href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
             {% endif %}
         </nav>
     </header>

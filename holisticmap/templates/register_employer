@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register as Employer</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'holisticmap/favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
 </head>
 <body>
@@ -63,7 +64,8 @@
                 <button type="submit">Register</button>
             </form>
 
-            <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+            <p>Already have an account?</p>
+            <a class="btn-secondary" href="{% url 'login' %}">Log in</a>
         </section>
     </main>
 </body>
