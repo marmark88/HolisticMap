@@ -26,13 +26,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="required_skills">Required Skills (comma separated):</label>
-                    <input type="text" id="required_skills" name="required_skills" placeholder="Python, Django, SQL">
+                    <label for="required_skills">Required Skills (comma separated, format: Skill|Years):</label>
+                    <input type="text" id="required_skills" name="required_skills" placeholder="Python|3, Django|2, SQL|2">
                 </div>
 
                 <div class="form-group">
-                    <label for="preferred_skills">Preferred Skills (comma separated):</label>
-                    <input type="text" id="preferred_skills" name="preferred_skills" placeholder="AWS, React, Docker">
+                    <label for="preferred_skills">Preferred Skills (comma separated, format: Skill|Years):</label>
+                    <input type="text" id="preferred_skills" name="preferred_skills" placeholder="AWS|1, React|2, Docker|1">
+                </div>
+
+                <div class="form-group">
+                    <label for="required_education">Required Education (comma separated, format: Degree|Field):</label>
+                    <input type="text" id="required_education" name="required_education" placeholder="BS|Computer Science, MS|Data Science">
+                </div>
+
+                <div class="form-group">
+                    <label for="preferred_education">Preferred Education (comma separated, format: Degree|Field):</label>
+                    <input type="text" id="preferred_education" name="preferred_education" placeholder="MBA|Business Administration">
                 </div>
 
                 <button type="submit">Create Role</button>

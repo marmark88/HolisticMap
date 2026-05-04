@@ -30,7 +30,6 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
-
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
@@ -46,6 +45,7 @@ class Employee(models.Model):
 class EmployeeSkill(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    years_experience = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ("employee", "skill")
@@ -78,9 +78,10 @@ class RoleSkill(models.Model):
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
 
     is_required = models.BooleanField(default=True)
+    min_years_experience = models.PositiveIntegerField(default=0)
 
     class Meta:
-        unique_together = ("role", "skill")
+        unique_together = ("role", "skill", "is_required")
 
 class Education(models.Model):
     school = models.CharField(max_length=255)
@@ -103,3 +104,6 @@ class RoleEducation(models.Model):
 class EmployeeEducation(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     education = models.ForeignKey(Education, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("employee", "education")

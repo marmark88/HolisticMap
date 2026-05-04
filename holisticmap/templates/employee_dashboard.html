@@ -15,11 +15,11 @@
         <h2>Your Skills</h2>
         {% if employee_skills %}
             <ul>
-            {% for skill in employee_skills %}
+            {% for employee_skill in employee_skills %}
                 <li>
-                    {{ skill.name }}
+                    {{ employee_skill.skill.name }} ({{ employee_skill.years_experience }} years)
                     <span class="inline-actions">
-                        <a class="btn-danger" href="{% url 'remove_skill' skill.id %}">Remove</a>
+                        <a class="btn-danger" href="{% url 'remove_skill' employee_skill.skill.id %}">Remove</a>
                     </span>
                 </li>
             {% endfor %}
@@ -32,7 +32,35 @@
         <form method="post" action="{% url 'add_skill' %}">
             {% csrf_token %}
             <input type="text" name="skill_name" placeholder="Skill name" required>
+            <input type="number" name="years_experience" min="0" placeholder="Years of experience" required>
             <button type="submit">Add Skill</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Your Education</h2>
+        {% if employee_education %}
+            <ul>
+            {% for education in employee_education %}
+                <li>
+                    {{ education.school }} - {{ education.degree }} - {{ education.field_of_study }}
+                    <span class="inline-actions">
+                        <a class="btn-danger" href="{% url 'remove_education' education.id %}">Remove</a>
+                    </span>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">You have not added any education yet.</p>
+        {% endif %}
+
+        <h3>Add Education</h3>
+        <form method="post" action="{% url 'add_education' %}">
+            {% csrf_token %}
+            <input type="text" name="school" placeholder="School" required>
+            <input type="text" name="degree" placeholder="Degree" required>
+            <input type="text" name="field_of_study" placeholder="Field of study" required>
+            <button type="submit">Add Education</button>
         </form>
     </section>
 

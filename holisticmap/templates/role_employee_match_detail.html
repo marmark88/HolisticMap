@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <title>{{ role.title }} - {{ employee.name }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
+</head>
+<body>
+<main class="container">
+    <section class="card">
+        <h1>{{ employee.name }} - {{ role.title }}</h1>
+        <p><strong>Company:</strong> {{ role.company.name }}</p>
+        <p><strong>Match Score:</strong> {{ match.score }}%</p>
+    </section>
+
+    <section class="card">
+        <h2>Matching Required Skills</h2>
+        <p class="muted">
+            {% for item in match.matching_required_skills %}
+                {{ item.skill.name }} ({{ item.employee_years }}/{{ item.required_years }} years){% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No matching required skills</em>
+            {% endfor %}
+        </p>
+        <h2>Missing Required Skills</h2>
+        <p class="muted">
+            {% for item in match.missing_required_skills %}
+                {{ item.skill.name }}
+                ({% if item.employee_years != None %}{{ item.employee_years }}/{{ item.required_years }}{% else %}0/{{ item.required_years }}{% endif %} years)
+                {% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No missing required skills</em>
+            {% endfor %}
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>Matching Preferred Skills</h2>
+        <p class="muted">
+            {% for item in match.matching_preferred_skills %}
+                {{ item.skill.name }} ({{ item.employee_years }}/{{ item.required_years }} years){% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No matching preferred skills</em>
+            {% endfor %}
+        </p>
+        <h2>Missing Preferred Skills</h2>
+        <p class="muted">
+            {% for item in match.missing_preferred_skills %}
+                {{ item.skill.name }}
+                ({% if item.employee_years != None %}{{ item.employee_years }}/{{ item.required_years }}{% else %}0/{{ item.required_years }}{% endif %} years)
+                {% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No missing preferred skills</em>
+            {% endfor %}
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>Matching Education</h2>
+        <p class="muted">
+            {% for education in match.matching_education %}
+                {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No matching education</em>
+            {% endfor %}
+        </p>
+        <h2>Missing Required Education</h2>
+        <p class="muted">
+            {% for education in match.missing_required_education %}
+                {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No missing required education</em>
+            {% endfor %}
+        </p>
+        <h2>Missing Preferred Education</h2>
+        <p class="muted">
+            {% for education in match.missing_preferred_education %}
+                {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <em>No missing preferred education</em>
+            {% endfor %}
+        </p>
+    </section>
+
+    <a class="btn" href="{% url 'role_detail' role.id %}">Back to Role</a>
+</main>
+</body>
+</html>

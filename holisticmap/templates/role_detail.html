@@ -19,8 +19,8 @@
         <h2>Required Skills</h2>
         {% if required_skills %}
             <ul>
-                {% for skill in required_skills %}
-                    <li>{{ skill.name }}</li>
+                {% for role_skill in required_skills %}
+                    <li>{{ role_skill.skill.name }} ({{ role_skill.min_years_experience }} years)</li>
                 {% endfor %}
             </ul>
         {% else %}
@@ -32,12 +32,38 @@
         <h2>Preferred Skills</h2>
         {% if preferred_skills %}
             <ul>
-                {% for skill in preferred_skills %}
-                    <li>{{ skill.name }}</li>
+                {% for role_skill in preferred_skills %}
+                    <li>{{ role_skill.skill.name }} ({{ role_skill.min_years_experience }} years)</li>
                 {% endfor %}
             </ul>
         {% else %}
             <p class="muted">No preferred skills listed for this role.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Required Education</h2>
+        {% if required_education %}
+            <ul>
+                {% for education in required_education %}
+                    <li>{{ education.degree }} - {{ education.field_of_study }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No required education listed for this role.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Preferred Education</h2>
+        {% if preferred_education %}
+            <ul>
+                {% for education in preferred_education %}
+                    <li>{{ education.degree }} - {{ education.field_of_study }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No preferred education listed for this role.</p>
         {% endif %}
     </section>
 
@@ -56,19 +82,63 @@
                         {% endfor %}
                     </p>
                     <p class="muted">
+                        Matching Required Skills:
+                        {% for item in match.matching_required_skills %}
+                            {{ item.skill.name }} ({{ item.employee_years }}/{{ item.required_years }} years){% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No matching required skills</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
                         Missing Required Skills:
-                        {% for skill in match.missing_required_skills %}
-                            {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                        {% for item in match.missing_required_skills %}
+                            {{ item.skill.name }}
+                            ({% if item.employee_years != None %}{{ item.employee_years }}/{{ item.required_years }}{% else %}0/{{ item.required_years }}{% endif %} years)
+                            {% if not forloop.last %}, {% endif %}
                         {% empty %}
                             <em>No missing required skills</em>
                         {% endfor %}
                     </p>
                     <p class="muted">
+                        Matching Preferred Skills:
+                        {% for item in match.matching_preferred_skills %}
+                            {{ item.skill.name }} ({{ item.employee_years }}/{{ item.required_years }} years){% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No matching preferred skills</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
                         Missing Preferred Skills:
-                        {% for skill in match.missing_preferred_skills %}
-                            {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                        {% for item in match.missing_preferred_skills %}
+                            {{ item.skill.name }}
+                            ({% if item.employee_years != None %}{{ item.employee_years }}/{{ item.required_years }}{% else %}0/{{ item.required_years }}{% endif %} years)
+                            {% if not forloop.last %}, {% endif %}
                         {% empty %}
                             <em>No missing preferred skills</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
+                        Matching Education:
+                        {% for education in match.matching_education %}
+                            {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No matching education</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
+                        Missing Required Education:
+                        {% for education in match.missing_required_education %}
+                            {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No missing required education</em>
+                        {% endfor %}
+                    </p>
+                    <p class="muted">
+                        Missing Preferred Education:
+                        {% for education in match.missing_preferred_education %}
+                            {{ education.degree }} - {{ education.field_of_study }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No missing preferred education</em>
                         {% endfor %}
                     </p>
                 {% endfor %}
@@ -81,33 +151,12 @@
             <h2>Matched Employees</h2>
             {% if matches %}
                 <ul>
-                    {% for match in matches %}
+                    {% for match in summary_matches %}
                         <li>
-                            {{ match.employee.name }} - Match Score: {{ match.score }}%
-                            <p class="muted">
-                                Matching Skills:
-                                {% for skill in match.matching_skills %}
-                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
-                                {% empty %}
-                                    <em>No matching skills</em>
-                                {% endfor %}
-                            </p>
-                            <p class="muted">
-                                Missing Required Skills:
-                                {% for skill in match.missing_required_skills %}
-                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
-                                {% empty %}
-                                    <em>No missing required skills</em>
-                                {% endfor %}
-                            </p>
-                            <p class="muted">
-                                Missing Preferred Skills:
-                                {% for skill in match.missing_preferred_skills %}
-                                    {{ skill.name }}{% if not forloop.last %}, {% endif %}
-                                {% empty %}
-                                    <em>No missing preferred skills</em>
-                                {% endfor %}
-                            </p>
+                            <a href="{% url 'role_employee_match_detail' role.id match.employee.id %}">
+                                {{ match.employee.name }}
+                            </a>
+                            - Match Score: {{ match.score }}%
                         </li>
                     {% endfor %}
                 </ul>
