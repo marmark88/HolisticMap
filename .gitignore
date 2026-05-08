@@ -13,6 +13,7 @@
 *.bmp
 *.tiff
 *.svg
+!holisticmap/static/holisticmap/favicon.svg
 
 # Python
 *.pyc

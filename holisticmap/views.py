@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import (
     Executive,
     Company,
@@ -19,6 +19,22 @@ from .models import (
 from .services import match_employee_to_role
 from .forms import ExecutiveRegistrationForm, EmployerRegistrationForm, EmployeeRegistrationForm
 
+# Role education requirements match employees on degree + major only (see services.match_employee_to_role).
+# School is stored as a sentinel so rows stay unique without asking employers for institution.
+ROLE_REQUIREMENT_EDUCATION_SCHOOL = "ANY"
+
+FAVICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-label="H">
+  <rect width="32" height="32" rx="8" fill="#2563eb"/>
+  <path fill="#fff" d="M9 8h3.5v6.25h7V8H23v16h-3.5v-6.25h-7V24H9V8z"/>
+</svg>"""
+
+
+def site_favicon(request):
+    response = HttpResponse(FAVICON_SVG.strip(), content_type="image/svg+xml; charset=utf-8")
+    response["Cache-Control"] = "public, max-age=86400"
+    return response
+
+
 def _get_user_role(user):
     if hasattr(user, 'executive'):
         return 'executive'
@@ -29,24 +45,56 @@ def _get_user_role(user):
     return None
 
 
-def _parse_role_education_entry(raw_education):
-    parts = [part.strip() for part in raw_education.split("|")]
-    if len(parts) != 2 or not all(parts):
-        return None
-    return parts[0], parts[1]
+def _empty_role_draft(company_id):
+    return {
+        "company_id": company_id,
+        "title": "",
+        "description": "",
+        "required_skills": [],
+        "preferred_skills": [],
+        "required_education": [],
+        "preferred_education": [],
+    }
 
 
-def _parse_role_skill_entry(raw_skill):
-    parts = [part.strip() for part in raw_skill.split("|")]
-    if len(parts) != 2 or not all(parts):
-        return None
-    try:
-        years = int(parts[1])
-    except ValueError:
-        return None
-    if years < 0:
-        return None
-    return parts[0], years
+def _get_role_draft(request, company_id):
+    draft = request.session.get("role_draft")
+    if not draft or draft.get("company_id") != company_id:
+        draft = _empty_role_draft(company_id)
+        request.session["role_draft"] = draft
+        request.session.modified = True
+    return draft
+
+
+def _save_role_draft(request, draft):
+    request.session["role_draft"] = draft
+    request.session.modified = True
+
+
+def _sync_role_draft_basics_from_post(request, draft):
+    """Keep title/description in session when other forms POST (skills/education)."""
+    if 'draft_title' in request.POST:
+        draft["title"] = request.POST.get("draft_title", "").strip()
+    if 'draft_description' in request.POST:
+        draft["description"] = request.POST.get("draft_description", "").strip()
+    if 'draft_title' in request.POST or 'draft_description' in request.POST:
+        _save_role_draft(request, draft)
+
+
+def _merge_skill_into_bucket(bucket, skill_name, min_years):
+    key = skill_name.casefold()
+    for entry in bucket:
+        if entry["name"].casefold() == key:
+            entry["name"] = skill_name
+            entry["min_years"] = min_years
+            return
+    bucket.append({"name": skill_name, "min_years": min_years})
+
+
+def _redirect_after_role_action(request, current_role):
+    if current_role == "executive":
+        return redirect("executive_dashboard")
+    return redirect("employer_dashboard")
 
 
 def index(request):
@@ -421,106 +469,137 @@ def create_role(request, company_id):
     if current_role == 'employer' and company.id != request.user.employer.company_id:
         return HttpResponseForbidden("Cannot create role for another employer's company.")
 
+    if request.GET.get("cancel") == "1":
+        request.session.pop("role_draft", None)
+        return _redirect_after_role_action(request, current_role)
+
+    draft = _get_role_draft(request, company_id)
+    error = ""
+
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        required_skills = request.POST.get('required_skills', '')
-        preferred_skills = request.POST.get('preferred_skills', '')
-        required_education = request.POST.get('required_education', '')
-        preferred_education = request.POST.get('preferred_education', '')
+        action = request.POST.get("action", "")
+        _sync_role_draft_basics_from_post(request, draft)
 
-        if title and description:
-            # Save the new role and assign to a variable
-            role = Role.objects.create(company=company, title=title, description=description)
-            
-            # Role skill format: Skill|Years (comma separated list).
-            # Deduplicate within each bucket only so the same skill can exist
-            # as both required and preferred with different year thresholds.
-            required_skill_map = {}
-            for raw_entry in [s.strip() for s in required_skills.split(',') if s.strip()]:
-                parsed = _parse_role_skill_entry(raw_entry)
-                if not parsed:
-                    continue
-                skill_name, years_experience = parsed
-                required_skill_map[skill_name.casefold()] = (skill_name, years_experience)
+        if action in (
+            "add_required_skill",
+            "add_preferred_skill",
+        ):
+            bucket_key = "required_skills" if action == "add_required_skill" else "preferred_skills"
+            skill_name = request.POST.get("skill_name", "").strip()
+            years_raw = request.POST.get("min_years_experience", "0").strip()
+            try:
+                min_years = int(years_raw)
+            except ValueError:
+                min_years = -1
+            if skill_name and min_years >= 0:
+                _merge_skill_into_bucket(draft[bucket_key], skill_name, min_years)
+                _save_role_draft(request, draft)
+            return redirect("create_role", company_id=company_id)
 
-            preferred_skill_map = {}
-            for raw_entry in [s.strip() for s in preferred_skills.split(',') if s.strip()]:
-                parsed = _parse_role_skill_entry(raw_entry)
-                if not parsed:
-                    continue
-                skill_name, years_experience = parsed
-                skill_key = skill_name.casefold()
-                preferred_skill_map[skill_key] = (skill_name, years_experience)
+        if action in ("remove_required_skill", "remove_preferred_skill"):
+            bucket_key = "required_skills" if action == "remove_required_skill" else "preferred_skills"
+            try:
+                idx = int(request.POST.get("index", "-1"))
+            except ValueError:
+                idx = -1
+            if 0 <= idx < len(draft[bucket_key]):
+                draft[bucket_key].pop(idx)
+                _save_role_draft(request, draft)
+            return redirect("create_role", company_id=company_id)
 
-            for skill_name, years_experience in required_skill_map.values():
-                skill, _ = Skill.objects.get_or_create(name=skill_name)
-                RoleSkill.objects.create(
-                    role=role,
-                    skill=skill,
-                    is_required=True,
-                    min_years_experience=years_experience,
-                )
+        if action in ("add_required_education", "add_preferred_education"):
+            bucket_key = (
+                "required_education" if action == "add_required_education" else "preferred_education"
+            )
+            degree = request.POST.get("degree", "").strip()
+            field_of_study = request.POST.get("field_of_study", "").strip()
+            if degree and field_of_study:
+                draft[bucket_key].append({
+                    "degree": degree,
+                    "field_of_study": field_of_study,
+                })
+                _save_role_draft(request, draft)
+            return redirect("create_role", company_id=company_id)
 
-            for skill_name, years_experience in preferred_skill_map.values():
-                skill, _ = Skill.objects.get_or_create(name=skill_name)
-                RoleSkill.objects.create(
-                    role=role,
-                    skill=skill,
-                    is_required=False,
-                    min_years_experience=years_experience,
-                )
+        if action in ("remove_required_education", "remove_preferred_education"):
+            bucket_key = (
+                "required_education" if action == "remove_required_education" else "preferred_education"
+            )
+            try:
+                idx = int(request.POST.get("index", "-1"))
+            except ValueError:
+                idx = -1
+            if 0 <= idx < len(draft[bucket_key]):
+                draft[bucket_key].pop(idx)
+                _save_role_draft(request, draft)
+            return redirect("create_role", company_id=company_id)
 
-            # Role education format: Degree|Field of Study (comma separated list).
-            required_education_entries = {
-                entry.strip()
-                for entry in required_education.split(",")
-                if entry.strip()
-            }
-            preferred_education_entries = {
-                entry.strip()
-                for entry in preferred_education.split(",")
-                if entry.strip()
-            } - required_education_entries
-
-            for raw_entry in required_education_entries:
-                parsed = _parse_role_education_entry(raw_entry)
-                if not parsed:
-                    continue
-                degree, field_of_study = parsed
-                education, _ = Education.objects.get_or_create(
-                    school="ANY",
-                    degree=degree,
-                    field_of_study=field_of_study,
-                )
-                RoleEducation.objects.create(
-                    role=role,
-                    education=education,
-                    is_required=True,
-                )
-
-            for raw_entry in preferred_education_entries:
-                parsed = _parse_role_education_entry(raw_entry)
-                if not parsed:
-                    continue
-                degree, field_of_study = parsed
-                education, _ = Education.objects.get_or_create(
-                    school="ANY",
-                    degree=degree,
-                    field_of_study=field_of_study,
-                )
-                RoleEducation.objects.create(
-                    role=role,
-                    education=education,
-                    is_required=False,
-                )
-            
-            if current_role == 'executive':
-                return redirect('executive_dashboard')
+        if action == "submit_role":
+            title = request.POST.get("title", "").strip()
+            description = request.POST.get("description", "").strip()
+            draft["title"] = title
+            draft["description"] = description
+            _save_role_draft(request, draft)
+            if not title or not description:
+                error = "Enter a role title and description before submitting."
             else:
-                return redirect('employer_dashboard')
+                role = Role.objects.create(company=company, title=title, description=description)
 
-    return render(request, 'create_role.html', {'company': company})
+                for entry in draft["required_skills"]:
+                    skill, _ = Skill.objects.get_or_create(name=entry["name"])
+                    RoleSkill.objects.update_or_create(
+                        role=role,
+                        skill=skill,
+                        is_required=True,
+                        defaults={"min_years_experience": entry["min_years"]},
+                    )
+
+                for entry in draft["preferred_skills"]:
+                    skill, _ = Skill.objects.get_or_create(name=entry["name"])
+                    RoleSkill.objects.update_or_create(
+                        role=role,
+                        skill=skill,
+                        is_required=False,
+                        defaults={"min_years_experience": entry["min_years"]},
+                    )
+
+                for entry in draft["required_education"]:
+                    education, _ = Education.objects.get_or_create(
+                        school=ROLE_REQUIREMENT_EDUCATION_SCHOOL,
+                        degree=entry["degree"],
+                        field_of_study=entry["field_of_study"],
+                    )
+                    RoleEducation.objects.update_or_create(
+                        role=role,
+                        education=education,
+                        defaults={"is_required": True},
+                    )
+
+                for entry in draft["preferred_education"]:
+                    education, _ = Education.objects.get_or_create(
+                        school=ROLE_REQUIREMENT_EDUCATION_SCHOOL,
+                        degree=entry["degree"],
+                        field_of_study=entry["field_of_study"],
+                    )
+                    if RoleEducation.objects.filter(role=role, education=education).exists():
+                        continue
+                    RoleEducation.objects.create(
+                        role=role,
+                        education=education,
+                        is_required=False,
+                    )
+
+                request.session.pop("role_draft", None)
+                return _redirect_after_role_action(request, current_role)
+
+        return redirect("create_role", company_id=company_id)
+
+    return render(request, 'create_role.html', {
+        'company': company,
+        'role': current_role,
+        'draft': draft,
+        'error': error,
+    })
 
 @login_required
 def delete_role(request, role_id):

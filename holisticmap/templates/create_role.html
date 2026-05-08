@@ -1,54 +1,175 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <title>Create Role - Holistic Map</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="{% static 'holisticmap/favicon.svg' %}">
-    <link rel="stylesheet" href="{% static 'holisticmap/styles.css' %}">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <main class="container">
-        <section class="card">
-            <h1>Create a New Role for {{ company.name }}</h1>
-            <form method="post">
-                {% csrf_token %}
+{% block title %}Create Role - Holistic Map{% endblock %}
 
-                <div class="form-group">
-                    <label for="title">Role Title:</label>
-                    <input type="text" id="title" name="title" placeholder="Role title" required>
-                </div>
+{% block content %}
+<section class="card">
+    <h1>Create a New Role for {{ company.name }}</h1>
+    <p class="muted">Add skills and education one at a time, then submit the role when everything looks correct.</p>
 
-                <div class="form-group">
-                    <label for="description">Role Description:</label>
-                    <textarea id="description" name="description" placeholder="Describe the role..." rows="4" required></textarea>
-                </div>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
 
-                <div class="form-group">
-                    <label for="required_skills">Required Skills (comma separated, format: Skill|Years):</label>
-                    <input type="text" id="required_skills" name="required_skills" placeholder="Python|3, Django|2, SQL|2">
-                </div>
+    <h2>Role details</h2>
+    <p class="muted">Title and description stay filled in when you add or remove skills and education below.</p>
+    <div class="form-group">
+        <label for="title">Role title</label>
+        <input type="text" id="title" name="title" form="submit-role-form" placeholder="Role title" value="{{ draft.title }}" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Role description</label>
+        <textarea id="description" name="description" form="submit-role-form" placeholder="Describe the role..." rows="4" required>{{ draft.description }}</textarea>
+    </div>
 
-                <div class="form-group">
-                    <label for="preferred_skills">Preferred Skills (comma separated, format: Skill|Years):</label>
-                    <input type="text" id="preferred_skills" name="preferred_skills" placeholder="AWS|1, React|2, Docker|1">
-                </div>
+    <h2>Required skills</h2>
+    {% if draft.required_skills %}
+        <ul>
+            {% for entry in draft.required_skills %}
+                <li>
+                    {{ entry.name }} (minimum {{ entry.min_years }} years)
+                    <span class="inline-actions">
+                        <form method="post" class="inline-form" data-sync-role-draft>
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_required_skill">
+                            <input type="hidden" name="index" value="{{ forloop.counter0 }}">
+                            <button type="submit" class="btn-danger">Remove</button>
+                        </form>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">None added yet.</p>
+    {% endif %}
+    <h3>Add a required skill</h3>
+    <form method="post" data-sync-role-draft>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_required_skill">
+        <input type="text" name="skill_name" placeholder="Skill name" required>
+        <input type="number" name="min_years_experience" min="0" placeholder="Minimum years" required>
+        <button type="submit">Add required skill</button>
+    </form>
 
-                <div class="form-group">
-                    <label for="required_education">Required Education (comma separated, format: Degree|Field):</label>
-                    <input type="text" id="required_education" name="required_education" placeholder="BS|Computer Science, MS|Data Science">
-                </div>
+    <h2>Preferred skills</h2>
+    {% if draft.preferred_skills %}
+        <ul>
+            {% for entry in draft.preferred_skills %}
+                <li>
+                    {{ entry.name }} (minimum {{ entry.min_years }} years)
+                    <span class="inline-actions">
+                        <form method="post" class="inline-form" data-sync-role-draft>
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_preferred_skill">
+                            <input type="hidden" name="index" value="{{ forloop.counter0 }}">
+                            <button type="submit" class="btn-danger">Remove</button>
+                        </form>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">None added yet.</p>
+    {% endif %}
+    <h3>Add a preferred skill</h3>
+    <form method="post" data-sync-role-draft>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_preferred_skill">
+        <input type="text" name="skill_name" placeholder="Skill name" required>
+        <input type="number" name="min_years_experience" min="0" placeholder="Minimum years" required>
+        <button type="submit">Add preferred skill</button>
+    </form>
 
-                <div class="form-group">
-                    <label for="preferred_education">Preferred Education (comma separated, format: Degree|Field):</label>
-                    <input type="text" id="preferred_education" name="preferred_education" placeholder="MBA|Business Administration">
-                </div>
+    <h2>Required education</h2>
+    {% if draft.required_education %}
+        <ul>
+            {% for entry in draft.required_education %}
+                <li>
+                    {{ entry.degree }} — {{ entry.field_of_study }}
+                    <span class="inline-actions">
+                        <form method="post" class="inline-form" data-sync-role-draft>
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_required_education">
+                            <input type="hidden" name="index" value="{{ forloop.counter0 }}">
+                            <button type="submit" class="btn-danger">Remove</button>
+                        </form>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">None added yet.</p>
+    {% endif %}
+    <h3>Add required education</h3>
+    <form method="post" data-sync-role-draft>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_required_education">
+        <input type="text" name="degree" placeholder="Degree type (e.g. BS, BA, MS)" required>
+        <input type="text" name="field_of_study" placeholder="Major / field (e.g. Computer Science)" required>
+        <button type="submit">Add required education</button>
+    </form>
 
-                <button type="submit">Create Role</button>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
+    <h2>Preferred education</h2>
+    {% if draft.preferred_education %}
+        <ul>
+            {% for entry in draft.preferred_education %}
+                <li>
+                    {{ entry.degree }} — {{ entry.field_of_study }}
+                    <span class="inline-actions">
+                        <form method="post" class="inline-form" data-sync-role-draft>
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_preferred_education">
+                            <input type="hidden" name="index" value="{{ forloop.counter0 }}">
+                            <button type="submit" class="btn-danger">Remove</button>
+                        </form>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">None added yet.</p>
+    {% endif %}
+    <h3>Add preferred education</h3>
+    <form method="post" data-sync-role-draft>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_preferred_education">
+        <input type="text" name="degree" placeholder="Degree type (e.g. BS, BA, MS)" required>
+        <input type="text" name="field_of_study" placeholder="Major / field (e.g. Computer Science)" required>
+        <button type="submit">Add preferred education</button>
+    </form>
+
+    <hr>
+    <form method="post" id="submit-role-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="submit_role">
+        <button type="submit">Submit role</button>
+    </form>
+
+    <p class="muted">
+        <a href="{% url 'create_role' company.id %}?cancel=1">Cancel and discard draft</a>
+    </p>
+</section>
+<script>
+(function () {
+    var forms = document.querySelectorAll('form[data-sync-role-draft]');
+    var titleEl = document.getElementById('title');
+    var descEl = document.getElementById('description');
+    if (!titleEl || !descEl) return;
+    forms.forEach(function (form) {
+        form.addEventListener('submit', function () {
+            if (form.querySelector('input[name="draft_title"]')) return;
+            var t = document.createElement('input');
+            t.type = 'hidden';
+            t.name = 'draft_title';
+            t.value = titleEl.value;
+            form.appendChild(t);
+            var d = document.createElement('input');
+            d.type = 'hidden';
+            d.name = 'draft_description';
+            d.value = descEl.value;
+            form.appendChild(d);
+        });
+    });
+})();
+</script>
+{% endblock %}
