@@ -1,5 +1,5 @@
 # Holistic Map — install with: pip install -r requirements.txt
-Django>=6.0,<7
+Django>=5.2,<6
 dj-database-url>=2.3
 psycopg[binary]>=3.1
 gunicorn>=23.0
