@@ -1,0 +1,27 @@
+# Install: sudo cp holisticmap.service /etc/systemd/system/holisticmap.service
+# sudo mkdir -p /srv/holisticmap && sudo chown www-data:www-data /srv/holisticmap (see deploy/README.md)
+# sudo nano /etc/holisticmap.env  (copy from deploy/env.example)
+# sudo systemctl daemon-reload && sudo systemctl enable --now holisticmap
+
+[Unit]
+Description=Holistic Map Gunicorn
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+RuntimeDirectory=holisticmap
+EnvironmentFile=/etc/holisticmap.env
+WorkingDirectory=/srv/holisticmap
+ExecStart=/srv/holisticmap/venv/bin/gunicorn \
+    --workers 3 \
+    --threads 2 \
+    --timeout 120 \
+    --bind unix:/run/holisticmap/gunicorn.sock \
+    config.wsgi:application
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
