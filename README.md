@@ -8,6 +8,8 @@ Holistic Map is a Django web app for matching employees to internal roles based 
 
 Built for executives, employers, and employees to collaborate on role definition and candidate fit inside a company.
 
+Can be acessed via: http://http://136.112.20.152/
+
 ---
 
 ## Features
