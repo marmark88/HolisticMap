@@ -44,7 +44,7 @@ Can be acessed via: http://136.112.20.152/
 - **Backend:** Django
 - **Database:** SQLite (local dev), PostgreSQL (production/Supabase)
 - **Server:** Gunicorn + nginx (VM deployment)
-- **Static files:** WhiteNoise + collectstatic
+- **Static files:** HTML/CSS/JS
 
 ---
 
